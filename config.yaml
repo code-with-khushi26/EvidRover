@@ -1,0 +1,60 @@
+# EvidRover-Lite Configuration
+# All knobs and experiment parameters reside here.
+
+llm:
+  provider: "mock"                 # Options: 'mock', 'gemini', 'openai_compatible', 'anthropic'
+  model: "gemini-2.5-flash"
+  temperature: 0.0
+  cache_dir: "cache/llm"
+  max_retries: 2
+  budget:
+    max_tokens: 5000000
+    max_cost_dollars: 10.0
+  pricing:                         # Cost in USD per 1M tokens
+    gemini-2.5-flash:
+      input_cost_per_million: 0.15
+      output_cost_per_million: 0.60
+    gemini-1.5-flash:
+      input_cost_per_million: 0.075
+      output_cost_per_million: 0.30
+    mock:
+      input_cost_per_million: 0.0
+      output_cost_per_million: 0.0
+    default:
+      input_cost_per_million: 0.20
+      output_cost_per_million: 0.80
+
+data:
+  dataset_name: "princeton-nlp/SWE-bench_Lite"
+  dataset_split: "test"
+  seed: 42
+  subset_size: 40
+  pilot_size: 10
+  repos_dir: "workdir/repos"
+  cache_dir: "cache/data"
+
+retrieval:
+  token_budget_per_evidence_set: 4000
+  code_top_k: 5
+  doc_top_k: 3
+  commit_top_k: 3
+  issue_top_k: 3
+  bm25_k1: 1.5
+  bm25_b: 0.75
+  overlap_audit_threshold: 0.3
+
+gate:
+  gate_tau: 3                      # Minimum threshold (1-5 scale) for relevance, completeness, consistency
+  max_rounds: 3                    # Max escalation rounds
+
+escalation:
+  policy_rules:
+    intended_behavior: ["doc", "issue"]
+    similar_failure: ["issue"]
+    history_rationale: ["commit"]
+    missing_definition: ["code"]
+
+tier2:
+  faithfulness_theta: 0.7          # Threshold ratio of supported claims
+  run_tests: false                 # Test execution hook requires Docker
+  subset_size: 20
