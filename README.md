@@ -130,6 +130,13 @@ python -m src.runner --pipeline E_all_sources_always --subset data/subset.json
 python -m src.runner --pipeline F_gate_escalation --subset data/subset.json
 ```
 
+### Running the Live Gemini 2.5 Flash Experiment
+To run the automated experiment using your Gemini API key (saved separately under `runs/gemini_experiment/`):
+```bash
+# Runs B, C, E, F on the selected 5 instances with your Gemini key
+python run_gemini_experiment.py
+```
+
 ### Running Tier 2 (Patch Generation & Evidence Verification)
 To generate unified diff patches, cite evidence claims, and run evidence verification:
 ```bash
