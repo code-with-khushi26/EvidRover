@@ -1,0 +1,30 @@
+{
+  "instance_id": "matplotlib__matplotlib-23964",
+  "claims_evaluated": [
+    {
+      "claim": "Return True when handler succeeds instead of None",
+      "cites": [
+        "E1"
+      ],
+      "verdict": "Unsupported",
+      "explanation": "No valid evidence cited."
+    },
+    {
+      "claim": "Preserves backward compatibility",
+      "cites": [
+        "E2"
+      ],
+      "verdict": "Unsupported",
+      "explanation": "No valid evidence cited."
+    }
+  ],
+  "total_claims": 2,
+  "supported_count": 0,
+  "contradicted_count": 0,
+  "unsupported_count": 2,
+  "faithfulness_score": 0.0,
+  "verdict": "Rejected",
+  "rejection_reason": "Faithfulness 0.00 < threshold 0.70.",
+  "tests_status": "not_run",
+  "test_output": "Test execution disabled in config."
+}

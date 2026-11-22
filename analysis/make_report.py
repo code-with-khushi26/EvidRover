@@ -404,4 +404,11 @@ def build_report(
 
 
 if __name__ == "__main__":
-    build_report()
+    import argparse
+    parser = argparse.ArgumentParser(description="Generate EvidRover-Lite HTML Report")
+    parser.add_argument("--runs_dir", type=str, default="runs", help="Directory containing pipeline run traces")
+    parser.add_argument("--output", type=str, default="report/index.html", help="Output path for HTML report")
+    parser.add_argument("--config", type=str, default="config.yaml", help="Path to config.yaml")
+    args = parser.parse_args()
+
+    build_report(config_path=args.config, runs_dir=args.runs_dir, output_path=args.output)

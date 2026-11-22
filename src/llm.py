@@ -20,6 +20,12 @@ from dataclasses import asdict, dataclass
 from pathlib import Path
 from typing import Any, Dict, Optional
 
+try:
+    from dotenv import load_dotenv
+    load_dotenv(override=True)
+except ImportError:
+    pass
+
 logger = logging.getLogger("evidrover.llm")
 
 
@@ -48,9 +54,10 @@ class LLMClient:
     """Provider-agnostic LLM client with caching and budget enforcement."""
 
     def __init__(self, config: Dict[str, Any]):
+        self.config = config
         llm_cfg = config.get("llm", {})
-        self.provider = os.environ.get("LLM_PROVIDER", llm_cfg.get("provider", "mock")).lower()
-        self.model = os.environ.get("LLM_MODEL", llm_cfg.get("model", "mock-model"))
+        self.provider = (llm_cfg.get("provider") or os.environ.get("LLM_PROVIDER") or "mock").lower()
+        self.model = llm_cfg.get("model") or os.environ.get("LLM_MODEL") or "gemini-2.5-flash"
         self.temperature = float(llm_cfg.get("temperature", 0.0))
         self.max_retries = int(llm_cfg.get("max_retries", 2))
 
@@ -80,12 +87,16 @@ class LLMClient:
         if self.provider == "gemini":
             try:
                 from google import genai
-                api_key = os.environ.get("LLM_API_KEY") or os.environ.get("GEMINI_API_KEY")
+                cfg_key = self.config.get("llm", {}).get("api_key", "")
+                api_key = os.environ.get("LLM_API_KEY") or os.environ.get("GEMINI_API_KEY") or cfg_key
                 if not api_key:
                     logger.warning("No Gemini API key found. Falling back to mock provider.")
                     self.provider = "mock"
                 else:
-                    self._gemini_client = genai.Client(api_key=api_key)
+                    self._gemini_client = genai.Client(
+                        api_key=api_key,
+                        http_options={"api_version": "v1beta"}
+                    )
             except Exception as e:
                 logger.warning(f"Failed to initialize Gemini client ({e}). Falling back to mock.")
                 self.provider = "mock"
@@ -184,11 +195,19 @@ class LLMClient:
                 raise
             except Exception as e:
                 last_error = e
+                err_str = str(e).lower()
                 logger.warning(f"LLM call attempt {attempt + 1} failed: {e}")
                 if attempt < self.max_retries:
-                    time.sleep(1.5 ** attempt)
+                    if "429" in err_str or "quota" in err_str or "resource_exhausted" in err_str:
+                        logger.info("Rate limit (429) hit. Pausing 9 seconds before retry...")
+                        time.sleep(9.0)
+                    else:
+                        time.sleep(1.5 ** attempt)
 
-        # If live provider failed after retries, fallback to mock if permissible
+        # If live provider failed after retries, fail loudly to prevent silent substitution
+        if self.provider != "mock":
+            raise RuntimeError(f"Live provider {self.provider} failed after retries: {last_error}")
+
         logger.error(f"Provider {self.provider} failed all retries ({last_error}). Falling back to mock response.")
         text, p_tokens, c_tokens = self._mock_complete(prompt, system, json_schema)
         cost = 0.0

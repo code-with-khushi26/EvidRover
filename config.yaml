@@ -2,8 +2,9 @@
 # All knobs and experiment parameters reside here.
 
 llm:
-  provider: "mock"                 # Options: 'mock', 'gemini', 'openai_compatible', 'anthropic'
+  provider: "gemini"               # Options: 'gemini', 'mock', 'openai_compatible', 'anthropic'
   model: "gemini-2.5-flash"
+  api_key: ""                      # Or set via GEMINI_API_KEY / LLM_API_KEY environment variable or in .env
   temperature: 0.0
   cache_dir: "cache/llm"
   max_retries: 2

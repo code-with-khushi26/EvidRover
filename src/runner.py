@@ -14,6 +14,11 @@ from pathlib import Path
 from typing import Any, Dict, List, Optional
 
 import yaml
+try:
+    from dotenv import load_dotenv
+    load_dotenv(override=True)
+except ImportError:
+    pass
 
 from src.data import DatasetManager, Instance
 from src.evidence import Evidence, EvidenceSet
@@ -150,6 +155,12 @@ def main() -> None:
         action="store_true",
         help="Execute Tier 2 patch generation and evidence verification",
     )
+    parser.add_argument(
+        "--output_dir",
+        type=str,
+        default="runs",
+        help="Output directory for run traces (e.g. runs/gemini_experiment)",
+    )
     args = parser.parse_args()
 
     config = load_config(args.config)
@@ -173,7 +184,7 @@ def main() -> None:
     logger.info(f"LLM Provider: {llm_client.provider} | Model: {llm_client.model}")
 
     instances = dataset_mgr.get_instances(instance_ids)
-    runs_dir = Path("runs")
+    runs_dir = Path(args.output_dir)
     runs_dir.mkdir(parents=True, exist_ok=True)
 
     completed = 0

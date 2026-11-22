@@ -1,0 +1,30 @@
+{
+  "instance_id": "mwaskom__seaborn-3190",
+  "claims_evaluated": [
+    {
+      "claim": "Return True when handler succeeds instead of None",
+      "cites": [
+        "E1"
+      ],
+      "verdict": "Supported",
+      "explanation": "The cited evidence document clearly mentions this expectation."
+    },
+    {
+      "claim": "Preserves backward compatibility",
+      "cites": [
+        "E2"
+      ],
+      "verdict": "Supported",
+      "explanation": "The cited evidence document clearly mentions this expectation."
+    }
+  ],
+  "total_claims": 2,
+  "supported_count": 2,
+  "contradicted_count": 0,
+  "unsupported_count": 0,
+  "faithfulness_score": 1.0,
+  "verdict": "Rejected",
+  "rejection_reason": "Patch diff does not apply cleanly to base_commit.",
+  "tests_status": "not_run",
+  "test_output": "Test execution disabled in config."
+}

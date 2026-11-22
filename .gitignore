@@ -1,6 +1,7 @@
 workdir/repos/
 cache/
-runs/
+# runs/
 .pytest_cache/
 __pycache__/
 *.pyc
+.env
